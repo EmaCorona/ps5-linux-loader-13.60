@@ -96,6 +96,7 @@ static inline uint8_t kread8(uint64_t src) {
 }
 
 int set_offsets(void);
+bool hv_profile_is_complete(void);
 int init_global_vars(void);
 uint64_t get_offset_va(uint64_t offset);
 

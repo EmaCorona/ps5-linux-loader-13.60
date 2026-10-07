@@ -97,6 +97,9 @@ int set_offsets(void) {
   case 0x0761:
     env_offset = off_0761;
     break;
+  case 0x1360:
+    env_offset = off_1360;
+    break;
   default:
     return -1;
   }
@@ -377,4 +380,10 @@ void install_page_syscore(vm_offset_t va, vm_paddr_t pa, int bits) {
   uintptr_t syscore_pmap = getpmap(kernel_get_proc(MINI_SYSCORE_PID));
   uintptr_t syscore_pml4 = kread64(syscore_pmap + 0x20);
   install_page(syscore_pml4, va, pa, bits);
+}
+
+bool hv_profile_is_complete(void) {
+  return env_offset.KERNEL_CODE_CAVE != 0 &&
+         env_offset.HV_CODE_CAVE_PA != 0 &&
+         env_offset.HV_HANDLE_VMEXIT_PA != 0;
 }

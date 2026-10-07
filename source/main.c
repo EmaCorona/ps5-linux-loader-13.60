@@ -13,6 +13,19 @@ int main(void) {
     return -1;
   }
 
+  if (!hv_profile_is_complete()) {
+    if (fw == 0x1360) {
+      notify("Firmware 13.60 kernel profile detected.\\n");
+      notify("The 13.60 HV backend is not available in this tree yet.\\n");
+      notify("Aborting before Linux file mapping, resume preparation, and rest mode.\\n");
+      return -1;
+    }
+
+    notify("The firmware profile is incomplete for Linux boot.\\n");
+    notify("Aborting before Linux file mapping and resume preparation.\\n");
+    return -1;
+  }
+
   if (fetch_linux(&linux_i)) {
     notify("Something went wrong while installing linux files.\n");
     return -1;

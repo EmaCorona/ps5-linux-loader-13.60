@@ -25,6 +25,10 @@ Features:
 
 Support for 1.xx and 2.xx firmwares may be added in the future, but we will not prioritize this effort.
 
+### 13.60 port status
+
+This fork contains an **experimental 13.60 kernel profile**. Firmware 13.60 is detected and its verified kernel pmap offset is available to the payload, but the Linux boot path is intentionally fail-closed until a compatible 13.60 HV backend is implemented. The loader therefore stops **before** mapping Linux files, installing resume shellcode, or entering rest mode on 13.60.
+
 If you are on firmwares in-between or you want to update to a specific firmware, [download the correct PUP](https://darthsternie.net/ps5-firmwares/) and follow the [official guide](https://www.playstation.com/en-us/support/hardware/reinstall-playstation-system-software-safe-mode) to upgrade your PS5. **Obviously you cannot downgrade.**
 
 ## Hardwares
@@ -261,7 +265,7 @@ For any future ps5-linux updates, you can download the `.deb` or `.pkg.tar.zst` 
 ## FAQ
 
 - Q: Will higher >=8.00 firmwares be supported?
-  - A: No.
+  - A: Upstream does not support them. This fork has an experimental 13.60 kernel profile, but 13.60 Linux boot is not implemented yet.
 - Q: Why can I not use M.2 on 3.xx?
   - A: Because the PS5 fails to boot with it attached.
 - Q: Can I dual-boot Linux and PS5 OS?

@@ -765,3 +765,17 @@ offset_list off_0761 = {
     .PS5_WIFI_FW_OFFSET = (0xFFFFFFFF81655800 - KERNEL_TEXT),
     .PS5_WIFI_FW_SIZE = 497636,
 };
+
+/*
+ * Firmware 13.60 kernel profile.
+ *
+ * Verified against ps5-payload-dev/sdk crt/kernel.c (case 0x13600000):
+ *   KERNEL_OFFSET_VMSPACE_VM_PMAP = 0x2e8
+ *
+ * This profile deliberately leaves Linux/HV-resume fields unset until a
+ * firmware-13.60 HV backend is available. main.c rejects incomplete profiles
+ * before Linux files are mapped or the suspend/resume path is modified.
+ */
+offset_list off_1360 = {
+    .VMSPACE_VM_PMAP = 0x2E8,
+};
