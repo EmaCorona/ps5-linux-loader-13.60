@@ -8,6 +8,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 OFFSETS = (ROOT / "source" / "offsets.c").read_text(encoding="utf-8")
 BACKEND = (ROOT / "source" / "hv_backend.c").read_text(encoding="utf-8")
+BACKEND_H = (ROOT / "include" / "hv_backend.h").read_text(encoding="utf-8")
 MAIN = (ROOT / "source" / "main.c").read_text(encoding="utf-8")
 
 
@@ -49,7 +50,27 @@ for token in (
     if token not in BACKEND:
         fail(f"backend validation token missing: {token}")
 
-if "hv_backend_is_available" not in MAIN:
-    fail("main must gate execution through hv_backend_is_available")
+for token in (
+    "hv_backend_context",
+    "hv_backend_prepare_fn",
+    "HV_BACKEND_INVALID_ARGUMENT",
+    "hv_backend_status_name",
+):
+    if token not in BACKEND_H:
+        fail(f"backend API token missing: {token}")
 
-print("PASS: 13.60 profile and HV integration gate are consistent")
+for token in (
+    "const hv_backend_context backend_context",
+    "hv_backend_prepare(&backend_context)",
+    "hv_backend_is_available",
+):
+    if token not in MAIN:
+        fail(f"main backend lifecycle token missing: {token}")
+
+if "prepare = NULL" not in BACKEND:
+    fail("unsupported firmware descriptor must not expose a provider")
+
+if "backend_1360.available = true" in BACKEND:
+    fail("13.60 backend must remain disabled until verified")
+
+print("PASS: 13.60 profile, backend contract and lifecycle gate are consistent")
