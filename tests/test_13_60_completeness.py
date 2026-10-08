@@ -190,20 +190,15 @@ for required in (
     if required not in build_workflow:
         fail(f"13.60 build workflow missing {required}")
 
-for doc, name in (
-    (port_doc, "PORT_13_60.md"),
-    (build_doc, "BUILD_13_60.md"),
-    (contract_doc, "HV_PROVIDER_13_60.md"),
-):
-    if not any(
-        phrase in doc
-        for phrase in (
-            "remains pending",
-            "remains disabled",
-            "integration is pending",
-        )
-    ):
-        fail(f"{name} must state that 13.60 Linux/HV enablement is gated")
+doc_expectations = (
+    (port_doc, "PORT_13_60.md", ("Current blocker", "HV implementation")),
+    (build_doc, "BUILD_13_60.md", ("HV backend", "remains disabled")),
+    (contract_doc, "HV_PROVIDER_13_60.md", ("Activation gate", "real-console validation")),
+)
+for doc, name, phrases in doc_expectations:
+    for phrase in phrases:
+        if phrase not in doc:
+            fail(f"{name} is missing required gating statement: {phrase}")
 
 for marker in (
     ".HV_CODE_CAVE_PA =",
