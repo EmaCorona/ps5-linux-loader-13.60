@@ -13,8 +13,17 @@ int main(void) {
 
   if (!hv_backend_is_available()) {
     notify("Firmware %04x has no complete Linux HV backend.\n", fw);
-    if (fw == 0x1360)
+    if (fw == 0x1360) {
       notify("The 13.60 kernel profile is present, but HV integration is pending.\n");
+      uint32_t missing = hv_backend_missing_requirements();
+      if (missing != 0) {
+        notify("Missing backend profile capabilities:\n");
+        for (uint32_t bit = 1; bit != 0; bit <<= 1) {
+          if (missing & bit)
+            notify("  - %s\n", hv_profile_requirement_name(bit));
+        }
+      }
+    }
     notify("Aborting before Linux file mapping and resume preparation.\n");
     return -1;
   }
