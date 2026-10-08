@@ -1,18 +1,38 @@
 #include "hv_provider_1360.h"
 
-#include <stdbool.h>
+#define FW_1360 0x1360u
 
 static bool context_is_valid(const hv_backend_context *context) {
-  return context != NULL && context->firmware == 0x1360 &&
-         context->shellcode_kernel != NULL &&
-         context->shellcode_kernel_len != 0;
+  if (context == NULL)
+    return false;
+
+  if (context->firmware != FW_1360)
+    return false;
+
+  /*
+   * These values are loader-produced state. Requiring all of them here makes
+   * the provider boundary fail closed if a future caller wires the backend
+   * too early in the lifecycle.
+   */
+  if (context->kernel_text == 0 || context->kernel_data == 0 ||
+      context->dmap_base == 0)
+    return false;
+
+  if (context->shellcode_kernel == NULL ||
+      context->shellcode_kernel_len == 0)
+    return false;
+
+  if (context->linux_info_va == 0)
+    return false;
+
+  return true;
 }
 
 bool hv_provider_1360_is_compatible(const hv_backend_context *context) {
   /*
-   * Compatibility here intentionally means only that the loader supplied a
-   * well-formed 13.60 context. It must not be interpreted as proof that the
-   * required HV transition is available.
+   * Compatibility means only that the complete loader context is internally
+   * well formed for firmware 13.60. It is not proof that a Hypervisor
+   * transition is available.
    */
   return context_is_valid(context);
 }
