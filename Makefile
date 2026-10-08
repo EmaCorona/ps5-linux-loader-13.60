@@ -1,10 +1,14 @@
-.PHONY: all clean test
+.PHONY: all clean test verify-13-60
 
 ifndef PS5_PAYLOAD_SDK
     PS5_PAYLOAD_SDK = /opt/ps5-payload-sdk/
 endif
 
+# Host-side regression tests must not require the PS5 SDK.
+# The toolchain is only included when a build-oriented target is requested.
+ifneq ($(filter test verify-13-60,$(MAKECMDGOALS)),test verify-13-60)
 include $(PS5_PAYLOAD_SDK)/toolchain/prospero.mk
+endif
 
 BIN := bin/ps5-linux-loader.elf
 SRC := $(wildcard source/*.c)
@@ -38,9 +42,13 @@ $(BIN): $(OBJS)
 	$(CC) $(OBJS) $(LDFLAGS) -o $@
 
 test:
+	python3 -m compileall -q tests
 	python3 tests/test_13_60_profile.py
 	python3 tests/test_13_60_provider.py
 	python3 tests/test_13_60_diagnostic.py
+	python3 tests/test_13_60_completeness.py
+
+verify-13-60: test
 
 clean:
 	rm -f $(BIN) $(OBJS)
