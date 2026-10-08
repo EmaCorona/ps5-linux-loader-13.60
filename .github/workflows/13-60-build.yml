@@ -6,7 +6,7 @@ on:
       - feature/13.60-hv-provider-scaffold
   pull_request:
     branches:
-      - feature/13.60-hv-provider-scaffold
+      - develop/13.60
 
 jobs:
   build:
