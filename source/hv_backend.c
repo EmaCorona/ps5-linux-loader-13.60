@@ -2,6 +2,7 @@
 #include "hv_defeat_0304.h"
 #include "hv_defeat_0506.h"
 #include "hv_defeat_0607.h"
+#include "hv_provider_1360.h"
 #include "utils.h"
 
 static const uint32_t HV_PROFILE_1360_REQUIREMENTS =
@@ -39,11 +40,7 @@ static hv_backend_status legacy_prepare_0607(
  */
 static hv_backend_status hv_backend_prepare_1360(
     const hv_backend_context *context) {
-  (void)context;
-
-  notify("HV backend for firmware 13.60 is not available.\n");
-  notify("No firmware-specific VM-exit/resume payload will be attempted.\n");
-  return HV_BACKEND_UNAVAILABLE;
+  return hv_provider_1360_prepare(context);
 }
 
 static const hv_backend_descriptor backend_1360 = {

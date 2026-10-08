@@ -1,3 +1,4 @@
+#include "diagnostic_1360.h"
 #include "hv_backend.h"
 #include "loader.h"
 #include "prepare_resume.h"
@@ -11,19 +12,15 @@ int main(void) {
     return -1;
   }
 
+  if (fw == 0x1360) {
+    notify("Firmware 13.60 detected: executable diagnostic path enabled.\n");
+    if (run_1360_diagnostic())
+      return -1;
+    return 0;
+  }
+
   if (!hv_backend_is_available()) {
     notify("Firmware %04x has no complete Linux HV backend.\n", fw);
-    if (fw == 0x1360) {
-      notify("The 13.60 kernel profile is present, but HV integration is pending.\n");
-      uint32_t missing = hv_backend_missing_requirements();
-      if (missing != 0) {
-        notify("Missing backend profile capabilities:\n");
-        for (uint32_t bit = 1; bit != 0; bit <<= 1) {
-          if (missing & bit)
-            notify("  - %s\n", hv_profile_requirement_name(bit));
-        }
-      }
-    }
     notify("Aborting before Linux file mapping and resume preparation.\n");
     return -1;
   }
@@ -55,7 +52,7 @@ int main(void) {
   if (backend_status != HV_BACKEND_OK) {
     notify("HV backend preparation failed: %s.\n",
            hv_backend_status_name(backend_status));
-    goto err;
+    return -1;
   }
 
   notify("Finished preparation. Going to rest mode in 5 seconds.\nPlease wait "
@@ -70,8 +67,4 @@ int main(void) {
   }
 
   return 0;
-
-err:
-  notify("Please make sure your fw is supported.");
-  return -1;
 }

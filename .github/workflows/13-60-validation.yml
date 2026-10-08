@@ -4,14 +4,15 @@ on:
   push:
     branches:
       - develop/13.60
+      - feature/13.60-hv-provider-scaffold
   pull_request:
     branches:
       - develop/13.60
 
 jobs:
-  profile-validation:
+  regression:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run 13.60 profile regression test
-        run: python3 tests/test_13_60_profile.py
+      - name: Run complete 13.60 regression suite
+        run: make verify-13-60
