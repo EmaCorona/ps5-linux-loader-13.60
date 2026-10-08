@@ -37,6 +37,7 @@ $(BIN): $(OBJS)
 
 test:
 	python3 tests/test_13_60_profile.py
+	python3 tests/test_13_60_provider.py
 
 clean:
 	rm -f $(BIN) $(OBJS)
