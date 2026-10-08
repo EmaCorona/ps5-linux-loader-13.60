@@ -1,6 +1,4 @@
-#include "hv_defeat_0304.h"
-#include "hv_defeat_0506.h"
-#include "hv_defeat_0607.h"
+#include "hv_backend.h"
 #include "loader.h"
 #include "prepare_resume.h"
 #include "utils.h"
@@ -13,15 +11,10 @@ int main(void) {
     return -1;
   }
 
-  if (!hv_profile_is_complete()) {
-    if (fw == 0x1360) {
-      notify("Firmware 13.60 kernel profile detected.\n");
-      notify("The 13.60 HV backend is not available in this tree yet.\n");
-      notify("Aborting before Linux file mapping, resume preparation, and rest mode.\n");
-      return -1;
-    }
-
-    notify("The firmware profile is incomplete for Linux boot.\n");
+  if (!hv_backend_is_available()) {
+    notify("Firmware %04x has no complete Linux HV backend.\n", fw);
+    if (fw == 0x1360)
+      notify("The 13.60 kernel profile is present, but HV integration is pending.\n");
     notify("Aborting before Linux file mapping and resume preparation.\n");
     return -1;
   }
@@ -38,18 +31,9 @@ int main(void) {
     return -1;
   }
 
-  if ((0x0300 <= fw) && (fw < 0x0500)) {
-    if (hv_defeat_0304(shellcode_kernel, shellcode_kernel_len))
-      goto err;
-  } else if ((0x0500 <= fw) && (fw < 0x0650)) {
-    if (hv_defeat_0506(shellcode_kernel, shellcode_kernel_len))
-      goto err;
-  } else if ((0x0650 <= fw) && (fw < 0x0800)) {
-    if (hv_defeat_0607(shellcode_kernel, shellcode_kernel_len))
-      goto err;
-  } else {
+  notify("Selected HV backend: %s\n", hv_backend_name());
+  if (hv_backend_prepare(shellcode_kernel, shellcode_kernel_len) != HV_BACKEND_OK)
     goto err;
-  }
 
   notify("Finished preparation. Going to rest mode in 5 seconds.\nPlease wait "
          "for the orange light to stop "
@@ -65,7 +49,7 @@ int main(void) {
   return 0;
 
 err:
-  notify("Something went wrong while defeating Hypervisor.\nPlease make sure "
+  notify("HV backend preparation failed.\nPlease make sure "
          "your fw is supported.");
   return -1;
 }
