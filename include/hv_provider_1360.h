@@ -4,7 +4,7 @@
 #include "hv_backend.h"
 
 /*
- * Safe integration boundary for a future 13.60 provider.
+ * Safe integration boundary for a future firmware-13.60 Hypervisor provider.
  *
  * This module performs validation and capability reporting only. It does not
  * implement Hypervisor compromise, VM-exit interception, arbitrary HV memory
