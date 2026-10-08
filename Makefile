@@ -25,7 +25,7 @@ $(SC_0607_H):
 $(SC_HV_H):
 	$(MAKE) -C shellcode_hv
 
-$(SC_K_H):
+$(SC_K_H): $(SC_HV_H)
 	$(MAKE) -C shellcode_kernel
 
 $(OBJS): %.o: %.c
