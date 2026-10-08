@@ -1,3 +1,4 @@
+#include "diagnostic_1360.h"
 #include "hv_backend.h"
 #include "loader.h"
 #include "prepare_resume.h"
@@ -9,6 +10,13 @@ int main(void) {
     notify("Something went wrong while initiating.\nPlease make sure your fw "
            "is supported.");
     return -1;
+  }
+
+  if (fw == 0x1360) {
+    notify("Firmware 13.60 detected: executable diagnostic path enabled.\n");
+    if (run_1360_diagnostic())
+      return -1;
+    return 0;
   }
 
   if (!hv_backend_is_available()) {
