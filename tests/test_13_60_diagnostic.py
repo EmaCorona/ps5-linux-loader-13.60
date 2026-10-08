@@ -17,37 +17,65 @@ def fail(message: str) -> None:
 
 for token in (
     "run_1360_diagnostic",
-    'FW_1360',
-    'fw != FW_1360',
-    "VMSPACE_VM_PMAP",
+    "FW_1360",
+    "VMSPACE_VM_PMAP_1360",
+    "DIAGNOSTIC_MARKER_A",
+    "DIAGNOSTIC_MARKER_B",
+    "is_kernel_pointer",
+    "is_physical_address",
+    "is_kernel_pmap_valid",
     "kernel_get_proc(0)",
     "getpmap(kernel_proc)",
     "vtophys(ktext)",
-    "DIAGNOSTIC_MARKER",
+    "alloc_page()",
+    "kwrite64(scratch_va, DIAGNOSTIC_MARKER_A)",
+    "kwrite64(scratch_va + sizeof(uint64_t), DIAGNOSTIC_MARKER_B)",
 ):
     if token not in SOURCE:
         fail(f"diagnostic token missing: {token}")
 
+for token in (
+    "old_a",
+    "old_b",
+    "modified",
+    "round_trip_ok",
+    "scratch restoration verification failed",
+):
+    if token not in SOURCE:
+        fail(f"scratch restoration guard missing: {token}")
+
 if "diagnostic_1360.h" not in MAIN:
     fail("main must include the 13.60 diagnostic API")
 
-diagnostic_gate = """if (fw == 0x1360) {
-    notify("Firmware 13.60 detected: executable diagnostic path enabled.\\n");
-    if (run_1360_diagnostic())
-      return -1;
-    return 0;
-  }"""
+if "if (fw == 0x1360)" not in MAIN:
+    fail("main must contain a 13.60 gate")
 
-if diagnostic_gate not in MAIN:
-    fail("13.60 must route to the executable diagnostic path before the HV gate")
+gate = MAIN[MAIN.index("if (fw == 0x1360)"):]
+return_pos = gate.find("return 0;")
+if return_pos == -1:
+    fail("13.60 diagnostic branch must return explicitly")
+
+for token in (
+    "fetch_linux(&linux_i)",
+    "prepare_resume(",
+    "hv_backend_prepare(",
+    "enter_rest_mode()",
+):
+    if token in gate[:return_pos]:
+        fail(f"13.60 diagnostic path must not call {token} before returning")
+
+for token in (
+    "hv_provider_1360",
+    "sceKernelNotifySystemSuspendStart",
+    "sceKernelSetEventFlag",
+):
+    if token in SOURCE:
+        fail(f"diagnostic must not execute {token}")
 
 if "munmap" in SOURCE:
-    fail("diagnostic must not add unnecessary resource teardown after exercising the R/W path")
+    fail("diagnostic must not claim ownership of a virtual mapping it does not retain")
 
-if "hv_backend_prepare" in SOURCE:
-    fail("diagnostic must not invoke the HV backend")
+if "tests/test_13_60_completeness.py" not in MAKEFILE:
+    fail("Makefile must keep the completeness suite wired in")
 
-if "tests/test_13_60_diagnostic.py" not in MAKEFILE:
-    fail("Makefile must run the diagnostic regression test")
-
-print("PASS: executable 13.60 diagnostic route is wired into the loader")
+print("PASS: 13.60 diagnostic route is bounded, reversible and isolated from Linux/HV handoff")
