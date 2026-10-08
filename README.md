@@ -29,9 +29,9 @@ Support for 1.xx and 2.xx is not currently planned.
 
 This fork contains an **experimental 13.60 kernel profile**. Firmware 13.60 is detected and the loader uses the verified `VMSPACE_VM_PMAP = 0x2e8` value. Public 13.60 sources also corroborate the kernel text/data layout and additional kernel metadata.
 
-The Linux boot path remains **fail-closed** on 13.60. The loader stops before Linux file mapping, resume preparation and the rest-mode handoff because a compatible, independently verified 13.60 Linux HV backend is not yet integrated.
+The Linux boot path remains **fail-closed** on 13.60. The loader now has an executable diagnostic path that validates the 13.60 kernel profile and kernel R/W environment, then exits without Linux file mapping, resume preparation or the rest-mode handoff.
 
-**13.60 Linux boot is not supported yet.**
+This makes the 13.60 payload **executable and testable on-console**, but it is **not a Linux boot yet** because a compatible, independently verified 13.60 Linux HV backend is still missing.
 
 For firmware updates, use the correct PUP and follow Sony's [official system-software procedure](https://www.playstation.com/en-us/support/hardware/reinstall-playstation-system-software-safe-mode). There is no official PS5 downgrade path.
 
