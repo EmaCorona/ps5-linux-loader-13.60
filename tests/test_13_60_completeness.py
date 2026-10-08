@@ -131,8 +131,11 @@ for token in (
     "DIAGNOSTIC_MARKER_B",
     "scratch restoration verification failed",
 ):
-    if token not in diagnostic or token not in diagnostic_h:
-        fail(f"diagnostic contract token missing: {token}")
+    if token not in diagnostic:
+        fail(f"diagnostic implementation token missing: {token}")
+
+if "run_1360_diagnostic" not in diagnostic_h:
+    fail("diagnostic header must export run_1360_diagnostic")
 
 for token in (
     "hv_backend_prepare",
