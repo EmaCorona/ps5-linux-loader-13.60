@@ -17,7 +17,8 @@ def fail(message: str) -> None:
 
 for token in (
     "run_1360_diagnostic",
-    'fw == 0x1360',
+    'FW_1360',
+    'fw != FW_1360',
     "VMSPACE_VM_PMAP",
     "kernel_get_proc(0)",
     "getpmap(kernel_proc)",
