@@ -31,6 +31,8 @@ $(SC_K_H): $(SC_HV_H)
 $(OBJS): %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+source/prepare_resume.o: $(SC_K_H)
+
 $(BIN): $(OBJS)
 	@mkdir -p $(dir $@)
 	$(CC) $(OBJS) $(LDFLAGS) -o $@
