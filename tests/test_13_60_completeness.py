@@ -179,7 +179,7 @@ for required in (
 if "verify-13-60" not in makefile:
     fail("Makefile must expose a dedicated verify-13-60 target")
 
-if "tests/test_13_60_completeness.py" not in workflow or "make test" not in workflow:
+if "tests/test_13_60_completeness.py" not in workflow or    "make verify-13-60" not in workflow:
     fail("13.60 validation workflow must execute the complete test suite")
 
 for required in (
