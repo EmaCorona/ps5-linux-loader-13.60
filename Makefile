@@ -6,7 +6,7 @@ endif
 
 # Host-side regression tests must not require the PS5 SDK.
 # The toolchain is only included when a build-oriented target is requested.
-ifneq ($(filter test verify-13-60,$(MAKECMDGOALS)),test verify-13-60)
+ifeq ($(strip $(filter test verify-13-60,$(MAKECMDGOALS))),)
 include $(PS5_PAYLOAD_SDK)/toolchain/prospero.mk
 endif
 
