@@ -1,0 +1,17 @@
+name: 13.60 integration validation
+
+on:
+  push:
+    branches:
+      - develop/13.60
+  pull_request:
+    branches:
+      - develop/13.60
+
+jobs:
+  profile-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run 13.60 profile regression test
+        run: python3 tests/test_13_60_profile.py
