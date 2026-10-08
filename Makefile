@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean test
 
 ifndef PS5_PAYLOAD_SDK
     PS5_PAYLOAD_SDK = /opt/ps5-payload-sdk/
@@ -34,6 +34,9 @@ $(OBJS): %.o: %.c
 $(BIN): $(OBJS)
 	@mkdir -p $(dir $@)
 	$(CC) $(OBJS) $(LDFLAGS) -o $@
+
+test:
+	python3 tests/test_13_60_profile.py
 
 clean:
 	rm -f $(BIN) $(OBJS)
