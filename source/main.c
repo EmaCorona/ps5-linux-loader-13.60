@@ -40,9 +40,23 @@ int main(void) {
     return -1;
   }
 
+  const hv_backend_context backend_context = {
+      .firmware = fw,
+      .kernel_text = ktext,
+      .kernel_data = kdata,
+      .dmap_base = dmap,
+      .shellcode_kernel = shellcode_kernel,
+      .shellcode_kernel_len = shellcode_kernel_len,
+      .linux_info_va = linux_i.linux_info,
+  };
+
   notify("Selected HV backend: %s\n", hv_backend_name());
-  if (hv_backend_prepare(shellcode_kernel, shellcode_kernel_len) != HV_BACKEND_OK)
+  hv_backend_status backend_status = hv_backend_prepare(&backend_context);
+  if (backend_status != HV_BACKEND_OK) {
+    notify("HV backend preparation failed: %s.\n",
+           hv_backend_status_name(backend_status));
     goto err;
+  }
 
   notify("Finished preparation. Going to rest mode in 5 seconds.\nPlease wait "
          "for the orange light to stop "
@@ -58,7 +72,6 @@ int main(void) {
   return 0;
 
 err:
-  notify("HV backend preparation failed.\nPlease make sure "
-         "your fw is supported.");
+  notify("Please make sure your fw is supported.");
   return -1;
 }
