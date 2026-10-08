@@ -1,0 +1,46 @@
+name: 13.60 build validation
+
+on:
+  push:
+    branches:
+      - feature/13.60-hv-provider-scaffold
+  pull_request:
+    branches:
+      - feature/13.60-hv-provider-scaffold
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make gcc binutils xxd wget unzip python3
+
+      - name: Install PS5 Payload SDK v0.43
+        run: |
+          wget -q https://github.com/ps5-payload-dev/sdk/releases/download/v0.43/ps5-payload-sdk.zip -O /tmp/ps5-payload-sdk.zip
+          sudo unzip -q /tmp/ps5-payload-sdk.zip -d /opt
+          test -f /opt/ps5-payload-sdk/toolchain/prospero.mk
+
+      - name: Static validation
+        run: make test
+
+      - name: Build loader
+        env:
+          PS5_PAYLOAD_SDK: /opt/ps5-payload-sdk
+        run: make -j2
+
+      - name: Inspect ELF
+        run: |
+          file bin/ps5-linux-loader.elf
+          readelf -h bin/ps5-linux-loader.elf
+
+      - name: Upload ELF
+        uses: actions/upload-artifact@v4
+        with:
+          name: ps5-linux-loader-13.60-scaffold
+          path: bin/ps5-linux-loader.elf
