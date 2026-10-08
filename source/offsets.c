@@ -769,12 +769,21 @@ offset_list off_0761 = {
 /*
  * Firmware 13.60 kernel profile.
  *
- * Verified against ps5-payload-dev/sdk crt/kernel.c (case 0x13600000):
- *   KERNEL_OFFSET_VMSPACE_VM_PMAP = 0x2e8
+ * Loader-relevant value:
+ *   VMSPACE_VM_PMAP = 0x2e8
  *
- * This profile deliberately leaves Linux/HV-resume fields unset until a
- * firmware-13.60 HV backend is available. main.c rejects incomplete profiles
- * before Linux files are mapped or the suspend/resume path is modified.
+ * The 13.60 PS5 Payload SDK profile also corroborates the kernel text/data
+ * relationship and several kernel symbols (allproc, security_flags,
+ * rootvnode, bus_data_devices). Those values are intentionally not copied
+ * into this structure because the loader does not consume them directly.
+ *
+ * Independent 13.60 offset sets also exist for the userland/kernel exploit
+ * chain, but they are not Linux-loader offsets and are therefore kept out of
+ * this profile.
+ *
+ * Linux/HV-resume fields remain unset until a separately verified 13.60 HV
+ * backend is available. main.c rejects incomplete profiles before Linux
+ * files are mapped or the suspend/resume path is modified.
  */
 offset_list off_1360 = {
     .VMSPACE_VM_PMAP = 0x2E8,
